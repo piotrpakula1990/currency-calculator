@@ -1,8 +1,9 @@
 package com.example.data.respositories
 
-import com.example.data.api.models.ExchangeCurrencyRates
+import com.example.data.models.ExchangeRates
+import kotlinx.coroutines.flow.Flow
 
 interface CurrencyRepository {
 
-    suspend fun getExchangeCurrencyRates(baseCurrency: String) : ExchangeCurrencyRates
+    fun getExchangeRates(baseCurrency: String): Flow<ExchangeRates>
 }

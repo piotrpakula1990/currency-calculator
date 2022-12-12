@@ -1,9 +1,9 @@
-package com.example.data.api.models
+package com.example.data.remote.models
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ExchangeCurrencyRates(
+data class ExchangeRatesRemote(
 
     val success: Boolean,
 
