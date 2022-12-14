@@ -1,4 +1,4 @@
-package com.example.currencycalculator.views.exchange
+package com.example.currencycalculator.main.views.exchange
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,13 +24,16 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import com.example.currencycalculator.navigation.Destination
+import com.example.currencycalculator.main.navigation.Destination
 import com.example.currencycalculator.utils.Currency
 import com.example.currencycalculator.utils.SuffixTransformation
+import org.koin.androidx.compose.get
 
 @OptIn(ExperimentalUnitApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExchangeRatesView() {
+
+    val viewModel = get<ExchangeRatesViewModel>()
 
     var value by remember { mutableStateOf(1.0f) }
     val baseCurrency by remember { mutableStateOf(Currency.EUR) }

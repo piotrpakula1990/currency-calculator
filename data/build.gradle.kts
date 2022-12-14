@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+
     // Kotlin Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
@@ -44,8 +45,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
-    // Joda time
-    implementation("net.danlew:android.joda:2.10.3")
+    // Joda Time
+    implementation("net.danlew:android.joda:${System.getProperty("jodaTimeVersion")}")
 
     // Data Store
     implementation("androidx.datastore:datastore-preferences:1.0.0")

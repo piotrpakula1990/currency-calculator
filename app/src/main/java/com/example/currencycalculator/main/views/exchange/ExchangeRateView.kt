@@ -1,4 +1,4 @@
-package com.example.currencycalculator.views.exchange
+package com.example.currencycalculator.main.views.exchange
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text

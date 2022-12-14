@@ -1,4 +1,4 @@
-package com.example.currencycalculator.navigation
+package com.example.currencycalculator.main.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column

@@ -74,8 +74,18 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
+    // Koin
+    val koinVersion = "3.2.2"
+    implementation("io.insert-koin:koin-android:$koinVersion")
+    implementation("io.insert-koin:koin-androidx-compose:3.4.0")
+
+    // Joda Time
+    implementation("net.danlew:android.joda:${System.getProperty("jodaTimeVersion")}")
+
     // Tests
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
+    // testImplementation "io.insert-koin:koin-test:$koin_version" //todo
+    // testImplementation "io.insert-koin:koin-test-junit4:$koin_version" //todo
 }

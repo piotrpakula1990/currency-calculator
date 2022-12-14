@@ -1,4 +1,4 @@
-package com.example.currencycalculator
+package com.example.currencycalculator.main
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -8,9 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.composable
-import com.example.currencycalculator.navigation.Destination
-import com.example.currencycalculator.navigation.MainActivityNavigation
-import com.example.currencycalculator.views.exchange.ExchangeRatesView
+import com.example.currencycalculator.main.navigation.Destination
+import com.example.currencycalculator.main.navigation.MainActivityNavigation
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesView
 
 class MainActivity : AppCompatActivity() {
 

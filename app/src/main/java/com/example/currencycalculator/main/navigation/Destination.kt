@@ -1,4 +1,4 @@
-package com.example.currencycalculator.navigation
+package com.example.currencycalculator.main.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
