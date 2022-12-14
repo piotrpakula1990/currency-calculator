@@ -16,45 +16,43 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun MainActivityNavigation(builder: NavGraphBuilder.() -> Unit) {
-    MaterialTheme {
-        val navController = rememberNavController()
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val selectedDestination = navBackStackEntry?.destination?.route
-            ?: Destination.Exchange.route
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val selectedDestination = navBackStackEntry?.destination?.route
+        ?: Destination.Exchange.route
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            NavHost(
-                modifier = Modifier.weight(1f),
-                navController = navController,
-                startDestination = selectedDestination,
-                builder = builder
-            )
+    Column(modifier = Modifier.fillMaxSize()) {
+        NavHost(
+            modifier = Modifier.weight(1f),
+            navController = navController,
+            startDestination = selectedDestination,
+            builder = builder
+        )
 
-            AnimatedVisibility(visible = true) {
-                NavigationBar(modifier = Modifier.fillMaxWidth()) {
-                    Destination.values().forEach { destination ->
-                        NavigationBarItem(
-                            selected = selectedDestination == destination.route,
-                            onClick = {
-                                navController.navigate(destination.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-
-                                    launchSingleTop = true
-                                    restoreState = true
+        AnimatedVisibility(visible = true) {
+            NavigationBar(modifier = Modifier.fillMaxWidth()) {
+                Destination.values().forEach { destination ->
+                    NavigationBarItem(
+                        selected = selectedDestination == destination.route,
+                        onClick = {
+                            navController.navigate(destination.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
                                 }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = destination.icon,
-                                    contentDescription = destination.label
-                                )
-                            },
-                            label = { Text(text = destination.label) },
-                            alwaysShowLabel = true
-                        )
-                    }
+
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = destination.label
+                            )
+                        },
+                        label = { Text(text = destination.label) },
+                        alwaysShowLabel = true
+                    )
                 }
             }
         }

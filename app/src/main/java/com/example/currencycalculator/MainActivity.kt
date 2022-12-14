@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.composable
 import com.example.currencycalculator.navigation.Destination
 import com.example.currencycalculator.navigation.MainActivityNavigation
+import com.example.currencycalculator.views.exchange.ExchangeRatesView
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
             MaterialTheme {
                 MainActivityNavigation {
                     composable(Destination.Exchange.route) {
-                        Text(text = "exchange")
+                        ExchangeRatesView()
                     }
                     composable(Destination.Settings.route) {
                         Text(text = "settings")
@@ -31,15 +32,17 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 700, heightDp = 500)
+@Preview(showBackground = true)
 @Composable
 fun MainActivityNavigationPreview() {
-    MainActivityNavigation {
-        composable(Destination.Exchange.route) {
-            Text(text = "exchange")
-        }
-        composable(Destination.Settings.route) {
-            Text(text = "settings")
+    MaterialTheme {
+        MainActivityNavigation {
+            composable(Destination.Exchange.route) {
+                ExchangeRatesView()
+            }
+            composable(Destination.Settings.route) {
+                Text(text = "settings")
+            }
         }
     }
 }
