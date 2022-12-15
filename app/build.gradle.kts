@@ -47,6 +47,10 @@ android {
 }
 
 dependencies {
+    val jodaTimeVersion: String by System.getProperties()
+    val junitVersion: String by System.getProperties()
+    val mockitoVersion: String by System.getProperties()
+    val mockitoKotlinVersion: String by System.getProperties()
 
     // Modules
     implementation(project(":data"))
@@ -75,15 +79,21 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
     // Koin
-    val koinVersion = "3.2.2"
-    implementation("io.insert-koin:koin-android:$koinVersion")
+    implementation("io.insert-koin:koin-android:3.3.1")
     implementation("io.insert-koin:koin-androidx-compose:3.4.0")
 
     // Joda Time
-    implementation("net.danlew:android.joda:${System.getProperty("jodaTimeVersion")}")
+    implementation("net.danlew:android.joda:$jodaTimeVersion")
 
     // Tests
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("junit:junit:$junitVersion")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    testImplementation("org.mockito:mockito-inline:$mockitoVersion")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
+    testImplementation("joda-time:joda-time:$jodaTimeVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+
+    // UI Tests
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
     // testImplementation "io.insert-koin:koin-test:$koin_version" //todo

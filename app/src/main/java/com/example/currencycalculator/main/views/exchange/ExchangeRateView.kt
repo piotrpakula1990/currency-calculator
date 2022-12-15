@@ -15,24 +15,25 @@ import com.example.currencycalculator.utils.Currency
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
-fun ExchangeRateView() {
+fun ExchangeRateView(baseCurrency: String, exchangeRate: CalculatedExchangeRate) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Column(
-            modifier = Modifier.weight(1f).padding(end = 24.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 24.dp),
             horizontalAlignment = Alignment.End
         ) {
             Text(
-                text = "91.394663 BDT",
+                text = "${exchangeRate.calculatedValue} ${exchangeRate.currency}",
                 fontSize = TextUnit(15f, TextUnitType.Sp)
             )
 
             Text(
-                text = "1 EUR = 91.394663 BDT",
+                text = "1 $baseCurrency = ${exchangeRate.rate} ${exchangeRate.currency}",
                 color = Color.Gray,
                 fontSize = TextUnit(10f, TextUnitType.Sp)
             )
@@ -41,7 +42,7 @@ fun ExchangeRateView() {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 modifier = Modifier.padding(end = 8.dp),
-                text = Currency.BDT.flag,
+                text = Currency.getFlag(exchangeRate.currency),
                 fontSize = TextUnit(25f, TextUnitType.Sp)
             )
         }
@@ -51,7 +52,8 @@ fun ExchangeRateView() {
 @Preview(showBackground = true)
 @Composable
 fun ExchangeRateViewPreview() {
-    ExchangeRateView()
+    val mock = CalculatedExchangeRate("USD", 1.5f, 5.5f)
+    ExchangeRateView(baseCurrency = "EUR", exchangeRate = mock)
 }
 
 

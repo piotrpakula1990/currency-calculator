@@ -37,6 +37,10 @@ android {
 }
 
 dependencies {
+    val jodaTimeVersion: String by System.getProperties()
+    val junitVersion: String by System.getProperties()
+    val mockitoVersion: String by System.getProperties()
+    val mockitoKotlinVersion: String by System.getProperties()
 
     // Kotlin Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
@@ -46,15 +50,15 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     // Joda Time
-    implementation("net.danlew:android.joda:${System.getProperty("jodaTimeVersion")}")
+    implementation("net.danlew:android.joda:$jodaTimeVersion")
 
     // Data Store
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Tests
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito:mockito-core:4.5.1")
-    testImplementation("org.mockito:mockito-inline:4.5.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
-    testImplementation("joda-time:joda-time:2.10.3")
+    testImplementation("junit:junit:$junitVersion")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    testImplementation("org.mockito:mockito-inline:$mockitoVersion")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
+    testImplementation("joda-time:joda-time:$jodaTimeVersion")
 }

@@ -4,17 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -38,12 +37,7 @@ import org.koin.androidx.compose.get
 @Composable
 fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
 
-    var value by remember { mutableStateOf(1.0f) }
-    val baseCurrency by remember { mutableStateOf(Currency.EUR) }
-
-    var progress by remember { mutableStateOf(0f) }
-
-    val lazyListState = rememberLazyListState()
+    val state = viewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
@@ -65,27 +59,33 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = value.toString(),
+                value = state.value.baseCurrencyValue.toString(),
                 modifier = Modifier.weight(1f),
                 label = { Text(text = "Type value:") },
                 singleLine = true,
-                visualTransformation = SuffixTransformation(" ${baseCurrency.name}"),
+                visualTransformation = SuffixTransformation(" ${state.value.baseCurrency}"),
                 textStyle = TextStyle(
                     fontSize = TextUnit(18f, TextUnitType.Sp),
                     textAlign = TextAlign.Right
                 ),
-                onValueChange = { it.toFloatOrNull()?.let { value = it } },
+                onValueChange = { stringValue ->
+                    val value = stringValue.toFloatOrNull() ?: return@OutlinedTextField
+                    viewModel.intent(ExchangeRatesAction.SetValue(value))
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             IconButton(
-                onClick = { progress = if (progress == 0f) 1f else 0f }
+                onClick = { viewModel.intent(ExchangeRatesAction.SetCurrency("EUR")) } // todo
             ) {
                 Box(
                     modifier = Modifier.padding(1.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = Currency.EUR.flag, fontSize = TextUnit(25f, TextUnitType.Sp))
+                    Text(
+                        text = Currency.getFlag(state.value.baseCurrency),
+                        fontSize = TextUnit(25f, TextUnitType.Sp)
+                    )
                     Icon(
                         modifier = Modifier
                             .align(BottomEnd)
@@ -94,39 +94,74 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
                             .background(Color.White)
                             .border(1.dp, Color.Gray, CircleShape),
                         imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = ""
+                        contentDescription = "Set base currency"
                     )
                 }
             }
         }
 
-
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .alpha(progress)
-                    .fillMaxWidth()
-                    .height(2.dp),
-                trackColor = Color.LightGray,
-                color = Color.Black
-            )
+            if (state.value.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    trackColor = Color.LightGray,
+                    color = Color.Black
+                )
+            } else {
+                Spacer(modifier = Modifier.size(0.dp, 2.dp))
+            }
         }
 
         Divider(modifier = Modifier.padding(bottom = 8.dp), color = Color.Black, thickness = 1.dp)
 
-        LazyColumn {
-            item {
-                ExchangeRateView()
-                Divider(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    color = Color.Gray,
-                    thickness = 1.dp
-                )
-            }
-            item {
-                ExchangeRateView()
+        when {
+            state.value.isEmpty -> EmptyExchangeRatesView()
+            state.value.error != null -> ErrorExchangeRatesView(error = state.value.error)
+            state.value.outputs.isNotEmpty() -> {
+                LazyColumn {
+                    state.value.outputs.forEachIndexed { index, exchangeRate ->
+                        item {
+                            ExchangeRateView(
+                                baseCurrency = state.value.baseCurrency,
+                                exchangeRate = exchangeRate
+                            )
+                            if (index < state.value.outputs.size - 1) {
+                                Divider(
+                                    modifier = Modifier.padding(vertical = 16.dp),
+                                    color = Color.Gray,
+                                    thickness = 1.dp
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+fun EmptyExchangeRatesView() {
+    // no any view
+}
+
+@OptIn(ExperimentalUnitApi::class)
+@Composable
+fun ErrorExchangeRatesView(error: Throwable?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(top = 40.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = error?.message ?: "Error",
+            fontSize = TextUnit(25f, TextUnitType.Sp),
+            color = Color.Red
+        )
     }
 }
 
