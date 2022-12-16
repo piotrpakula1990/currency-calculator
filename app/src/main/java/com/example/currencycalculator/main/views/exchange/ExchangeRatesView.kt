@@ -9,8 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Modifier
@@ -39,10 +38,12 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
 
     val state = viewModel.state.collectAsState()
 
+    var isOpenChooseCurrencyDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp),
     ) {
         Text(
             text = Destination.Exchange.label,
@@ -76,7 +77,7 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
             )
 
             IconButton(
-                onClick = { viewModel.intent(ExchangeRatesAction.SetCurrency("EUR")) } // todo
+                onClick = { isOpenChooseCurrencyDialog = true }
             ) {
                 Box(
                     modifier = Modifier.padding(1.dp),
@@ -139,6 +140,16 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
                 }
             }
         }
+    }
+
+    if (isOpenChooseCurrencyDialog) {
+        ChooseCurrencyDialog(
+            onDismiss = { isOpenChooseCurrencyDialog = false },
+            onChoseCurrency = { currency ->
+                isOpenChooseCurrencyDialog = false
+                viewModel.intent(ExchangeRatesAction.SetCurrency(currency))
+            }
+        )
     }
 }
 
