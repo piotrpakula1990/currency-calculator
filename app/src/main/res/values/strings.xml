@@ -1,3 +1,37 @@
 <resources>
+    <!-- App -->
     <string name="app_name">Currency Calculator</string>
+
+    <!-- Exchange Rates View -->
+    <string name="exchange_rates_type_value">Type value:</string>
+    <string name="exchange_rates_set_currency_description">Set base currency</string>
+    <string name="exchange_rates_choose_dialog_title">Choose base currency</string>
+
+    <!-- Currencies -->
+    <string name="AUD">"Australian Dollar</string>
+    <string name="AZN">"Azerbaijanian Manat</string>
+    <string name="BRL">"Brazilian Real</string>
+    <string name="CAD">"Canadian Dollar</string>
+    <string name="CNY">"Yuan Renminbi</string>
+    <string name="CZK">"Czech Koruna</string>
+    <string name="DKK">"Danish Krone</string>
+    <string name="EUR">"Euro</string>
+    <string name="GEL">"Lari</string>
+    <string name="HUF">"Forint</string>
+    <string name="ISK">"Iceland Krona</string>
+    <string name="INR">"Indian Rupee</string>
+    <string name="IDR">"Rupiah</string>
+    <string name="IRR">"Iranian Rial</string>
+    <string name="ILS">"New Israeli Sheqel</string>
+    <string name="JPY">"Yen</string>
+    <string name="MXN">"Mexican Peso</string>
+    <string name="NOK">"Norwegian Krone</string>
+    <string name="PLN">"Zloty</string>
+    <string name="RUB">"Russian Ruble</string>
+    <string name="RSD">"Serbian Dinar</string>
+    <string name="CHF">"Swiss Franc</string>
+    <string name="TRY">"Turkish Lira</string>
+    <string name="UAH">"Hryvnia</string>
+    <string name="USD">"US Dollar</string>
+
 </resources>

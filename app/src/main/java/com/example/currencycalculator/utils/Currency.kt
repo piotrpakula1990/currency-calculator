@@ -1,31 +1,34 @@
 package com.example.currencycalculator.utils
 
-enum class Currency(val fullName: String, val flag: String) {
-    AUD("Australian Dollar", "🇦🇺"),
-    AZN("Azerbaijanian Manat", "🇦🇿"),
-    BRL("Brazilian Real", "🇧🇷"),
-    CAD("Canadian Dollar", "🇨🇦"),
-    CNY("Yuan Renminbi", "🇨🇳"),
-    CZK("Czech Koruna", "🇨🇿"),
-    DKK("Danish Krone", "🇩🇰"),
-    EUR("Euro", "🇪🇺"),
-    GEL("Lari", "🇬🇪"),
-    HUF("Forint", "🇭🇺"),
-    ISK("Iceland Krona", "🇮🇸"),
-    INR("Indian Rupee", "🇮🇳"),
-    IDR("Rupiah", "🇲🇨"),
-    IRR("Iranian Rial", "🇮🇷"),
-    ILS("New Israeli Sheqel", "🇮🇱"),
-    JPY("Yen", "🇯🇵"),
-    MXN("Mexican Peso", "🇲🇽"),
-    NOK("Norwegian Krone", "🇧🇻"),
-    PLN("Zloty", "🇯🇵"),
-    RUB("Russian Ruble", "🇷🇺"),
-    RSD("Serbian Dinar", "🇷🇸"),
-    CHF("Swiss Franc", "🇨🇭"),
-    TRY("Turkish Lira", "🇹🇷"),
-    UAH("Hryvnia", "🇺🇦"),
-    USD("US Dollar", "🇺🇲");
+import androidx.annotation.StringRes
+import com.example.currencycalculator.R
+
+enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
+    AUD(R.string.AUD, "🇦🇺"),
+    AZN(R.string.AZN, "🇦🇿"),
+    BRL(R.string.BRL, "🇧🇷"),
+    CAD(R.string.CAD, "🇨🇦"),
+    CNY(R.string.CNY, "🇨🇳"),
+    CZK(R.string.CZK, "🇨🇿"),
+    DKK(R.string.DKK, "🇩🇰"),
+    EUR(R.string.EUR, "🇪🇺"),
+    GEL(R.string.GEL, "🇬🇪"),
+    HUF(R.string.HUF, "🇭🇺"),
+    ISK(R.string.ISK, "🇮🇸"),
+    INR(R.string.INR, "🇮🇳"),
+    IDR(R.string.IDR, "🇲🇨"),
+    IRR(R.string.IRR, "🇮🇷"),
+    ILS(R.string.ILS, "🇮🇱"),
+    JPY(R.string.JPY, "🇯🇵"),
+    MXN(R.string.MXN, "🇲🇽"),
+    NOK(R.string.NOK, "🇧🇻"),
+    PLN(R.string.PLN, "🇯🇵"),
+    RUB(R.string.RUB, "🇷🇺"),
+    RSD(R.string.RSD, "🇷🇸"),
+    CHF(R.string.CHF, "🇨🇭"),
+    TRY(R.string.TRY, "🇹🇷"),
+    UAH(R.string.UAH, "🇺🇦"),
+    USD(R.string.USD, "🇺🇲");
 
     companion object {
         fun getFlag(shortcut: String): String = try {

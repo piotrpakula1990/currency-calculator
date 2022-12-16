@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
 import com.example.currencycalculator.utils.Currency
 import com.example.currencycalculator.utils.SuffixTransformation
@@ -62,7 +64,7 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
             OutlinedTextField(
                 value = state.value.baseCurrencyValue.toString(),
                 modifier = Modifier.weight(1f),
-                label = { Text(text = "Type value:") },
+                label = { Text(text = stringResource(id = R.string.exchange_rates_type_value)) },
                 singleLine = true,
                 visualTransformation = SuffixTransformation(" ${state.value.baseCurrency}"),
                 textStyle = TextStyle(
@@ -95,7 +97,7 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
                             .background(Color.White)
                             .border(1.dp, Color.Gray, CircleShape),
                         imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = "Set base currency"
+                        contentDescription = stringResource(id = R.string.exchange_rates_set_currency_description)
                     )
                 }
             }

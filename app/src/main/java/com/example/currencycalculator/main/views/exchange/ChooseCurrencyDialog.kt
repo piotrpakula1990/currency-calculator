@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.currencycalculator.R
 import com.example.currencycalculator.utils.Currency
 
 @OptIn(ExperimentalUnitApi::class)
@@ -47,7 +49,7 @@ fun ChooseCurrencyDialog(
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 Text(
-                    text = "Choose Base Currency",
+                    text = stringResource(id = R.string.exchange_rates_choose_dialog_title),
                     fontSize = TextUnit(25f, TextUnitType.Sp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -71,7 +73,7 @@ fun ChooseCurrencyDialog(
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = rememberRipple(color = Color.Gray),
-                                        onClick = { onChoseCurrency(currency.name)}
+                                        onClick = { onChoseCurrency(currency.name) }
                                     ),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -83,7 +85,7 @@ fun ChooseCurrencyDialog(
                                     )
                                 }
 
-                                Text(text = "${currency.name} (${currency.fullName})")
+                                Text(text = "${currency.name} (${stringResource(id = currency.fullNameId)})")
                             }
 
                             if (index < size - 1) {
