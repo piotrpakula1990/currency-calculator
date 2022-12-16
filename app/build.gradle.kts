@@ -71,9 +71,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.material3:material3-window-size-class")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.5.3")
@@ -92,10 +89,13 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
     testImplementation("joda-time:joda-time:$jodaTimeVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // UI Tests
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
-    // testImplementation "io.insert-koin:koin-test:$koin_version" //todo
-    // testImplementation "io.insert-koin:koin-test-junit4:$koin_version" //todo
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    // testImplementation "io.insert-koin:koin-test:$koin_version"
+    // testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
 }
