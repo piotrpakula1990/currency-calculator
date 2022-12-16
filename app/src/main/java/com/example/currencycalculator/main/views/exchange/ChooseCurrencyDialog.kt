@@ -83,7 +83,7 @@ fun ChooseCurrencyDialog(
                                     )
                                 }
 
-                                Text(text = currency.name)
+                                Text(text = "${currency.name} (${currency.fullName})")
                             }
 
                             if (index < size - 1) {

@@ -2,6 +2,7 @@ package com.example.currencycalculator.main.views.exchange
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.currencycalculator.utils.Currency
 import com.example.data.models.ExchangeRates
 import com.example.data.respositories.CurrencyRepository
 import kotlinx.coroutines.Job
@@ -51,7 +52,10 @@ class ExchangeRatesViewModel(private val currencyRepository: CurrencyRepository)
             try {
                 statePrivate.emit(newState.copy(isLoading = true))
 
-                val exchangeRates = currencyRepository.getExchangeRates(currency).single()
+                val exchangeRates = currencyRepository
+                    .getExchangeRates(currency)
+                    .map { filterKnownCurrencies(it) }
+                    .single()
                 delay(LOADING_DELAY)
 
                 statePrivate.emit(newState.copy(outputs = calculateRates(value, exchangeRates)))
@@ -72,6 +76,12 @@ class ExchangeRatesViewModel(private val currencyRepository: CurrencyRepository)
                 calculatedValue = exchangeRate.currencyRate * value
             )
         }
+    }
+
+    private fun filterKnownCurrencies(exchangeRates: ExchangeRates): ExchangeRates {
+        return exchangeRates.copy(
+            rates = exchangeRates.rates.filter { Currency.isExist(it.currencyShortcut) }
+        )
     }
 
     companion object {
