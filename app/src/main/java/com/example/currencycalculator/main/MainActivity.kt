@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import com.example.currencycalculator.main.navigation.Destination
 import com.example.currencycalculator.main.navigation.MainActivityNavigation
 import com.example.currencycalculator.main.views.exchange.ExchangeRatesView
+import com.example.currencycalculator.main.views.settings.SettingsView
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
                         ExchangeRatesView()
                     }
                     composable(Destination.Settings.route) {
-                        Text(text = "settings")
+                        SettingsView()
                     }
                 }
             }

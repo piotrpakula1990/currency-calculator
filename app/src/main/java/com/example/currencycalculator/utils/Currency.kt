@@ -22,7 +22,7 @@ enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
     JPY(R.string.JPY, "🇯🇵"),
     MXN(R.string.MXN, "🇲🇽"),
     NOK(R.string.NOK, "🇧🇻"),
-    PLN(R.string.PLN, "🇯🇵"),
+    PLN(R.string.PLN, "🇵🇱"),
     RUB(R.string.RUB, "🇷🇺"),
     RSD(R.string.RSD, "🇷🇸"),
     CHF(R.string.CHF, "🇨🇭"),
