@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 @Serializable
 data class ExchangeRates(
 
-    val baseCurrency: String,
+    val baseCurrency: Currency,
 
     @Serializable(DateTimeSerializer::class)
     val date: DateTime,

@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ExchangeRate(
-    val currencyShortcut: String,
+    val currency: Currency,
     val currencyRate: Float
 )

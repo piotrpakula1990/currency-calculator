@@ -1,7 +1,7 @@
-package com.example.currencycalculator.utils
+package com.example.data.models
 
 import androidx.annotation.StringRes
-import com.example.currencycalculator.R
+import com.example.data.R
 
 enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
     AUD(R.string.AUD, "🇦🇺"),
@@ -31,17 +31,11 @@ enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
     USD(R.string.USD, "🇺🇲");
 
     companion object {
-        fun getFlag(shortcut: String): String = try {
-            valueOf(shortcut).flag
-        } catch (e: Exception) {
-            ""
-        }
 
-        fun isExist(shortcut: String): Boolean = try {
+        fun getOrNull(shortcut: String): Currency? = try {
             valueOf(shortcut)
-            true
         } catch (e: Exception) {
-            false
+            null
         }
     }
 }

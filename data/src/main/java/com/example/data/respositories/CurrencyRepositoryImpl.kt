@@ -4,7 +4,9 @@ import com.example.data.local.LocalDataSource
 import com.example.data.remote.ExchangeRateService
 import com.example.data.models.ExchangeRates
 import com.example.data.mappers.asExchangeRates
+import com.example.data.models.Currency
 import com.example.data.models.exceptions.DeprecatedDataException
+import com.example.data.models.exceptions.MappingException
 import com.example.data.models.exceptions.NoDataException
 import kotlinx.coroutines.flow.*
 import org.joda.time.DateTime
@@ -14,16 +16,17 @@ class CurrencyRepositoryImpl(
     private val localDataSource: LocalDataSource
 ) : CurrencyRepository {
 
-    override fun getExchangeRates(baseCurrency: String): Flow<ExchangeRates> {
+    override fun getExchangeRates(baseCurrency: Currency): Flow<ExchangeRates> {
         return flow {
             try {
-                val exchangeRates = exchangeRateService.latest(baseCurrency).asExchangeRates()
+                val exchangeRates = exchangeRateService.latest(baseCurrency.name).asExchangeRates()
                 localDataSource.setExchangeRates(exchangeRates)
                 emit(exchangeRates)
             } catch (t : Throwable) {
                 val exchangeRates : ExchangeRates = localDataSource.getExchangeRates().first()
 
                 when {
+                    t is MappingException -> throw NoDataException()
                     isWrongBaseCurrency(baseCurrency, exchangeRates) -> throw NoDataException()
                     isExchangeRatesDeprecated(exchangeRates) -> throw DeprecatedDataException()
                     else -> emit(exchangeRates)
@@ -36,7 +39,7 @@ class CurrencyRepositoryImpl(
         return exchangeRates.date.plusDays(1) < DateTime.now()
     }
 
-    private fun isWrongBaseCurrency(baseCurrency: String, exchangeRates: ExchangeRates): Boolean {
+    private fun isWrongBaseCurrency(baseCurrency: Currency, exchangeRates: ExchangeRates): Boolean {
         return exchangeRates.baseCurrency != baseCurrency
     }
 }

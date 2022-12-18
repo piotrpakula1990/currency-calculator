@@ -1,7 +1,9 @@
 package com.example.currencycalculator.main.views.exchange
 
+import com.example.data.models.Currency
+
 data class ExchangeRatesUiState(
-    val baseCurrency: String,
+    val baseCurrency: Currency,
     val baseCurrencyValue: Float,
     val outputs: List<CalculatedExchangeRate> = listOf(),
     val isEmpty: Boolean = false,
@@ -10,12 +12,12 @@ data class ExchangeRatesUiState(
 )
 
 data class CalculatedExchangeRate(
-    val currency: String,
+    val currency: Currency,
     val rate: Float,
     val calculatedValue: Float
 )
 
 sealed class ExchangeRatesAction {
-    class SetCurrency(val currency: String) : ExchangeRatesAction()
+    class SetCurrency(val currency: Currency) : ExchangeRatesAction()
     class SetValue(val value: Float) : ExchangeRatesAction()
 }

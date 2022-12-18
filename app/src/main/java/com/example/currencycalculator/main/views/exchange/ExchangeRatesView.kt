@@ -26,8 +26,9 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
-import com.example.currencycalculator.utils.Currency
+import com.example.currencycalculator.main.views.dialogs.ChooseCurrencyDialog
 import com.example.currencycalculator.utils.SuffixTransformation
+import com.example.data.models.Currency
 import com.example.data.models.ExchangeRates
 import com.example.data.respositories.CurrencyRepository
 import kotlinx.coroutines.flow.Flow
@@ -86,7 +87,7 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = Currency.getFlag(state.value.baseCurrency),
+                        text = state.value.baseCurrency.flag,
                         fontSize = TextUnit(25f, TextUnitType.Sp)
                     )
                     Icon(
@@ -183,7 +184,7 @@ fun ErrorExchangeRatesView(error: Throwable?) {
 fun ExchangeRatesViewPreview() {
 
     val mockViewModel = ExchangeRatesViewModel(object : CurrencyRepository {
-        override fun getExchangeRates(baseCurrency: String): Flow<ExchangeRates> {
+        override fun getExchangeRates(baseCurrency: Currency): Flow<ExchangeRates> {
             return flow { }
         }
     })

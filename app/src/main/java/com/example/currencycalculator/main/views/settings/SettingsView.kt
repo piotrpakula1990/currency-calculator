@@ -1,5 +1,6 @@
 package com.example.currencycalculator.main.views.settings
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -23,16 +24,20 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
-import com.example.currencycalculator.utils.Currency
+import com.example.currencycalculator.main.views.dialogs.ChooseCurrencyDialog
+import org.koin.androidx.compose.get
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalUnitApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsView() {
+fun SettingsView(viewModel: SettingsViewModel = get()) {
 
-    val defaultCurrency by remember { mutableStateOf("USD") }
+    val state = viewModel.state.collectAsState()
 
     var isOpenChooseCurrencyDialog by remember { mutableStateOf(false) }
+    var isOpenOrderDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -48,10 +53,10 @@ fun SettingsView() {
             textAlign = TextAlign.Center
         )
 
-        SettingRow(label = "Default Base:", content = {
-
+        SettingRow(label = stringResource(id = R.string.settings_default_base), content = {
+            val fullCurrencyName = stringResource(id = state.value.defaultBaseCurrency.fullNameId)
             Text(
-                text = "$defaultCurrency (${stringResource(id = Currency.USD.fullNameId)})",
+                text = "${state.value.defaultBaseCurrency} $fullCurrencyName",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Left
             )
@@ -64,7 +69,7 @@ fun SettingsView() {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = Currency.getFlag(defaultCurrency),
+                        text = state.value.defaultBaseCurrency.flag,
                         fontSize = TextUnit(25f, TextUnitType.Sp)
                     )
                     Icon(
@@ -75,16 +80,18 @@ fun SettingsView() {
                             .background(Color.White)
                             .border(1.dp, Color.Gray, CircleShape),
                         imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = "Set default currency"
+                        contentDescription = stringResource(id = R.string.settings_default_base_description)
                     )
                 }
             }
         })
 
-        SettingRow(label = "Value Precision:", content = {
+        SettingRow(label = stringResource(id = R.string.settings_value_precision), content = {
+
+            val zeros = (0 until state.value.valuePrecision - 1).joinToString("") { "0" }
 
             Text(
-                text = "1.001",
+                text = "1.${zeros}1",
                 modifier = Modifier
                     .weight(0.8f)
                     .padding(vertical = 16.dp),
@@ -92,7 +99,7 @@ fun SettingsView() {
             )
 
             TextField(
-                value = "3",
+                value = state.value.valuePrecision.toString(),
                 modifier = Modifier.weight(0.2f),
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = Color.White,
@@ -103,47 +110,69 @@ fun SettingsView() {
                     textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                onValueChange = {})
+                onValueChange = { stringValue ->
+                    val value = stringValue.toIntOrNull() ?: return@TextField
+                    viewModel.intent(SettingsAction.SetValuePrecision(value))
+                })
         })
 
-        SettingRow(label = "Filter & Order:", content = {
+        SettingRow(
+            label = stringResource(id = R.string.settings_value_filter_and_order),
+            content = {
+                val examplePrecision = viewModel.state.value.order
+                    .take(4)
+                    .joinToString()
+                    .plus(", ...")
 
-            Text(
-                text = "USD, EUR, PLN, RUB, ...",
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 16.dp),
-                textAlign = TextAlign.Left
-            )
+                Text(
+                    text = examplePrecision,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 16.dp),
+                    textAlign = TextAlign.Left
+                )
 
-            IconButton(onClick = { }) {
-                Box(
-                    modifier = Modifier.padding(1.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(30.dp)
-                            .border(1.dp, Color.Gray, RoundedCornerShape(3.dp)),
+                IconButton(onClick = { isOpenOrderDialog = true }) {
+                    Box(
+                        modifier = Modifier.padding(1.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(30.dp)
+                                .border(1.dp, Color.Gray, RoundedCornerShape(3.dp)),
+                            imageVector = Icons.Filled.FormatListBulleted,
+                            contentDescription = stringResource(id = R.string.settings_value_filter_and_order_description)
+                        )
 
-                        imageVector = Icons.Filled.FormatListBulleted,
-                        contentDescription = "Set currencies order"
-                    )
-
-                    Icon(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .size(15.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
-                            .border(1.dp, Color.Gray, CircleShape),
-                        imageVector = Icons.Filled.UnfoldMore,
-                        contentDescription = "Set currencies order"
-                    )
+                        Icon(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(15.dp)
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .border(1.dp, Color.Gray, CircleShape),
+                            imageVector = Icons.Filled.UnfoldMore,
+                            contentDescription = stringResource(id = R.string.settings_value_filter_and_order_description)
+                        )
+                    }
                 }
-            }
-        })
+            })
+
+        if (isOpenChooseCurrencyDialog) {
+            ChooseCurrencyDialog(
+                onDismiss = { isOpenChooseCurrencyDialog = false },
+                onChoseCurrency = { currency ->
+                    isOpenChooseCurrencyDialog = false
+                    viewModel.intent(SettingsAction.SetBaseCurrency(currency))
+                }
+            )
+        }
+
+        if (isOpenOrderDialog) {
+            // todo create dialog
+        }
     }
 }
 
@@ -174,5 +203,6 @@ fun SettingRow(label: String, content: @Composable RowScope.() -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun SettingsViewPreview() {
-    SettingsView()
+    val mockViewModel = SettingsViewModel()
+    SettingsView(viewModel = mockViewModel)
 }

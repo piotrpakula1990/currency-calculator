@@ -1,6 +1,7 @@
 package com.example.data
 
 import com.example.data.local.LocalDataSource
+import com.example.data.models.Currency
 import com.example.data.models.ExchangeRates
 import com.example.data.models.exceptions.DeprecatedDataException
 import com.example.data.models.exceptions.NoDataException
@@ -29,11 +30,11 @@ class CurrencyRepositoryTests {
     fun `GIVEN correct remote data WHEN get exchange rates THEN data returned`() {
         runBlocking {
             val remoteData = ExchangeRatesRemote(true, "USD", "2020-10-10", mapOf())
-            val expected = ExchangeRates("USD", DateTime.parse("2020-10-10"), listOf())
+            val expected = ExchangeRates(Currency.USD, DateTime.parse("2020-10-10"), listOf())
             `when`(exchangeRateService.latest("USD")).thenReturn(remoteData)
 
             val exchangeRates = currencyRepository
-                .getExchangeRates("USD")
+                .getExchangeRates(Currency.USD)
                 .flowOn(Dispatchers.IO)
                 .first()
 
@@ -48,7 +49,7 @@ class CurrencyRepositoryTests {
             `when`(localDataSource.getExchangeRates()).thenThrow(NoDataException())
 
             currencyRepository
-                .getExchangeRates("USD")
+                .getExchangeRates(Currency.USD)
                 .flowOn(Dispatchers.IO)
                 .collect()
         }
@@ -57,12 +58,12 @@ class CurrencyRepositoryTests {
     @Test(expected = DeprecatedDataException::class)
     fun `GIVEN no remote data and deprecated local data WHEN get exchange rates THEN operation failed`() {
         runBlocking {
-            val localData = ExchangeRates("USD", DateTime.now().minusDays(1), listOf())
+            val localData = ExchangeRates(Currency.USD, DateTime.now().minusDays(1), listOf())
             `when`(exchangeRateService.latest("USD")).thenThrow(RuntimeException())
             `when`(localDataSource.getExchangeRates()).thenReturn(flowOf(localData))
 
             currencyRepository
-                .getExchangeRates("USD")
+                .getExchangeRates(Currency.USD)
                 .flowOn(Dispatchers.IO)
                 .collect()
         }
@@ -71,12 +72,27 @@ class CurrencyRepositoryTests {
     @Test(expected = NoDataException::class)
     fun `GIVEN no remote data and new base currency WHEN get exchange rates THEN operation failed`() {
         runBlocking {
-            val localData = ExchangeRates("USD", DateTime.now(), listOf())
+            val localData = ExchangeRates(Currency.USD, DateTime.now(), listOf())
             `when`(exchangeRateService.latest("PLN")).thenThrow(RuntimeException())
             `when`(localDataSource.getExchangeRates()).thenReturn(flowOf(localData))
 
             currencyRepository
-                .getExchangeRates("PLN")
+                .getExchangeRates(Currency.PLN)
+                .flowOn(Dispatchers.IO)
+                .collect()
+        }
+    }
+
+    @Test(expected = NoDataException::class)
+    fun `GIVEN no unknown remote data base currency WHEN get exchange rates THEN operation failed`() {
+        runBlocking {
+            val remoteData = ExchangeRatesRemote(true, "XXX", "2020-10-10", mapOf())
+            val localData = ExchangeRates(Currency.USD, DateTime.now(), listOf())
+            `when`(exchangeRateService.latest("USD")).thenReturn(remoteData)
+            `when`(localDataSource.getExchangeRates()).thenReturn(flowOf(localData))
+
+            currencyRepository
+                .getExchangeRates(Currency.USD)
                 .flowOn(Dispatchers.IO)
                 .collect()
         }

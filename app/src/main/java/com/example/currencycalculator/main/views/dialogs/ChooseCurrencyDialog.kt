@@ -1,4 +1,4 @@
-package com.example.currencycalculator.main.views.exchange
+package com.example.currencycalculator.main.views.dialogs
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.currencycalculator.R
-import com.example.currencycalculator.utils.Currency
+import com.example.data.models.Currency
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 fun ChooseCurrencyDialog(
     onDismiss: () -> Unit = {},
-    onChoseCurrency: (String) -> Unit = {}
+    onChoseCurrency: (Currency) -> Unit = {}
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
 
@@ -49,7 +49,7 @@ fun ChooseCurrencyDialog(
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 Text(
-                    text = stringResource(id = R.string.exchange_rates_choose_dialog_title),
+                    text = stringResource(id = R.string.dialogs_choose_currency_title),
                     fontSize = TextUnit(25f, TextUnitType.Sp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -73,7 +73,7 @@ fun ChooseCurrencyDialog(
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = rememberRipple(color = Color.Gray),
-                                        onClick = { onChoseCurrency(currency.name) }
+                                        onClick = { onChoseCurrency(currency) }
                                     ),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {

@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import com.example.currencycalculator.utils.Currency
+import com.example.data.models.Currency
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
-fun ExchangeRateView(baseCurrency: String, exchangeRate: CalculatedExchangeRate) {
+fun ExchangeRateView(baseCurrency: Currency, exchangeRate: CalculatedExchangeRate) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -42,7 +42,7 @@ fun ExchangeRateView(baseCurrency: String, exchangeRate: CalculatedExchangeRate)
         Box(contentAlignment = Alignment.Center) {
             Text(
                 modifier = Modifier.padding(end = 8.dp),
-                text = Currency.getFlag(exchangeRate.currency),
+                text = exchangeRate.currency.flag,
                 fontSize = TextUnit(25f, TextUnitType.Sp)
             )
         }
@@ -52,8 +52,8 @@ fun ExchangeRateView(baseCurrency: String, exchangeRate: CalculatedExchangeRate)
 @Preview(showBackground = true)
 @Composable
 fun ExchangeRateViewPreview() {
-    val mock = CalculatedExchangeRate("USD", 1.5f, 5.5f)
-    ExchangeRateView(baseCurrency = "EUR", exchangeRate = mock)
+    val mock = CalculatedExchangeRate(Currency.USD, 1.5f, 5.5f)
+    ExchangeRateView(baseCurrency = Currency.EUR, exchangeRate = mock)
 }
 
 
