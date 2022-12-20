@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -52,7 +53,7 @@ fun OrderCurrencyDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .padding(8.dp)
             ) {
                 Text(
                     text = stringResource(id = R.string.dialogs_order_title),
@@ -64,7 +65,6 @@ fun OrderCurrencyDialog(
                 )
 
                 Divider(
-                    modifier = Modifier.padding(bottom = 8.dp),
                     color = Color.Black,
                     thickness = 1.dp
                 )
@@ -181,78 +181,65 @@ private fun DragAndDropExampleItem(
 
     val verticalTranslation by animateIntAsState(targetValue = item.translation.toInt())
 
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(itemHeight)
-            .padding(2.dp)
+    Row(
+        modifier = Modifier
             .offset { IntOffset(0, offsetY.roundToInt() + verticalTranslation) }
-            .zIndex(zIndex)
+            .fillMaxWidth()
+            .padding(1.dp)
+            .background(color = Color.White)
+            .height(itemHeight)
+            .border(1.dp, Color.Gray, RoundedCornerShape(3.dp))
+            .padding(2.dp)
+            .zIndex(zIndex),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
+        Checkbox(
+            checked = !item.isHidden,
+            onCheckedChange = { onChecked(it) }
+        )
+
+        Text(
+            text = item.value.flag,
+            fontSize = TextUnit(20f, TextUnitType.Sp)
+        )
+
+        Text(
             modifier = Modifier
-                .background(color = Color.White)
-                .padding(2.dp)
-                .fillMaxWidth()
-                .border(1.dp, Color.Gray, RoundedCornerShape(3.dp))
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = !item.isHidden,
-                    onCheckedChange = { onChecked(it) }
+                .padding(start = 4.dp)
+                .width(0.dp)
+                .weight(1f),
+            text = "${item.value.name} (${stringResource(id = item.value.fullNameId)})",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Icon(
+            modifier = Modifier
+                .size(34.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rememberRipple(bounded = false),
+                    onClick = {}
                 )
+                .draggable(
+                    state = rememberDraggableState { delta ->
+                        offsetY += delta
 
-                Text(
-                    modifier = Modifier
-                        .padding(end = 8.dp),
-                    text = item.value.flag,
-                    fontSize = TextUnit(20f, TextUnitType.Sp)
-                )
-
-                Text(
-                    modifier = Modifier
-                        .width(0.dp)
-                        .weight(1f),
-                    text = "${item.value.name} (${stringResource(id = item.value.fullNameId)})",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Box(
-                    modifier = Modifier.padding(1.dp)
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = rememberRipple(bounded = false),
-                                onClick = {}
-                            )
-                            .draggable(
-                                state = rememberDraggableState { delta ->
-                                    offsetY += delta
-
-                                    if (offsetY != 0f) {
-                                        onMove((offsetY / heightPx).roundToInt())
-                                    }
-                                },
-                                orientation = Orientation.Vertical,
-                                onDragStopped = {
-                                    if (offsetY != 0f) {
-                                        val isSuccess = onDrop((offsetY / heightPx).roundToInt())
-                                        if (!isSuccess) offsetY = 0f
-                                    }
-                                }
-                            )
-                            .size(34.dp),
-                        imageVector = Icons.Filled.UnfoldMore,
-                        contentDescription = stringResource(id = R.string.dialogs_order_move_description)
-                    )
-                }
-            }
-        }
+                        if (offsetY != 0f) {
+                            onMove((offsetY / heightPx).roundToInt())
+                        }
+                    },
+                    orientation = Orientation.Vertical,
+                    onDragStopped = {
+                        if (offsetY != 0f) {
+                            val isSuccess = onDrop((offsetY / heightPx).roundToInt())
+                            if (!isSuccess) offsetY = 0f
+                        }
+                    }
+                ),
+            imageVector = Icons.Filled.UnfoldMore,
+            contentDescription = stringResource(id = R.string.dialogs_order_move_description)
+        )
     }
 }
 
