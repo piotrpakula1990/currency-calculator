@@ -15,5 +15,7 @@
 
     <!-- Dialogs View -->
     <string name="dialogs_choose_currency_title">Choose base currency</string>
+    <string name="dialogs_order_title">Order &amp; Filter</string>
+    <string name="dialogs_order_move_description">Set position</string>
 
 </resources>

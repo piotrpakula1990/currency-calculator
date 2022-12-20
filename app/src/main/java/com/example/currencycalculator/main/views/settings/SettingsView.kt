@@ -20,13 +20,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
 import com.example.currencycalculator.main.views.dialogs.ChooseCurrencyDialog
+import com.example.currencycalculator.main.views.dialogs.OrderCurrencyDialog
 import org.koin.androidx.compose.get
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -171,7 +169,11 @@ fun SettingsView(viewModel: SettingsViewModel = get()) {
         }
 
         if (isOpenOrderDialog) {
-            // todo create dialog
+            OrderCurrencyDialog(
+                initOrder = state.value.order,
+                onDismiss = { isOpenOrderDialog = false },
+                onSave = {}
+            )
         }
     }
 }
