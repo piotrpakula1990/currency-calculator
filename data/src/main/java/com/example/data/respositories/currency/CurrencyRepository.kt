@@ -1,4 +1,4 @@
-package com.example.data.respositories
+package com.example.data.respositories.currency
 
 import com.example.data.models.Currency
 import com.example.data.models.ExchangeRates

@@ -1,14 +1,16 @@
 package com.example.currencycalculator
 
 import com.example.currencycalculator.main.views.exchange.ExchangeRatesAction
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesUiState
 import com.example.currencycalculator.main.views.exchange.ExchangeRatesViewModel
-import com.example.currencycalculator.main.views.exchange.ExchangeRatesViewModel.Companion.DEFAULT_CURRENCY
 import com.example.currencycalculator.main.views.exchange.ExchangeRatesViewModel.Companion.LOADING_DELAY
-import com.example.data.models.Currency
+import com.example.data.models.Currency.*
 import com.example.data.models.ExchangeRate
 import com.example.data.models.ExchangeRates
+import com.example.data.models.Settings
 import com.example.data.models.exceptions.NoDataException
-import com.example.data.respositories.CurrencyRepositoryImpl
+import com.example.data.respositories.currency.CurrencyRepositoryImpl
+import com.example.data.respositories.settings.SettingsRepositoryImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -27,6 +29,7 @@ import org.mockito.Mockito.mock
 class ExchangeRatesViewModelTests {
 
     private val currencyRepository = mock(CurrencyRepositoryImpl::class.java)
+    private val settingsRepository = mock(SettingsRepositoryImpl::class.java)
 
     private lateinit var viewModel: ExchangeRatesViewModel
 
@@ -35,12 +38,22 @@ class ExchangeRatesViewModelTests {
     fun before() {
         Dispatchers.setMain(Dispatchers.IO)
 
-        // init default data
-        val exchangeRates = ExchangeRates(Currency.EUR, DateTime.now(), listOf())
-        `when`(currencyRepository.getExchangeRates(DEFAULT_CURRENCY))
-            .thenReturn(flowOf(exchangeRates))
+        runBlocking { // init default data
+            val rates = listOf(ExchangeRate(USD, 2f))
+            val exchangeRates = ExchangeRates(EUR, DateTime.now(), rates)
+            `when`(currencyRepository.getExchangeRates(EUR))
+                .thenReturn(flowOf(exchangeRates))
 
-        viewModel = ExchangeRatesViewModel(currencyRepository = currencyRepository)
+            val settings = Settings(EUR, 2, listOf(USD, EUR, GBP, PLN))
+            `when`(settingsRepository.getSettings()).thenReturn(flowOf(settings))
+
+            viewModel = ExchangeRatesViewModel(
+                currencyRepository = currencyRepository,
+                settingsRepository = settingsRepository
+            )
+
+            delay(LOADING_DELAY + 10) // wait until initialize reload is done.
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,81 +63,59 @@ class ExchangeRatesViewModelTests {
     }
 
     @Test
-    fun `GIVEN repository data WHEN set currency THEN success state returned`() {
+    fun `GIVEN repository data WHEN set currency THEN result state returned`() {
         runBlocking {
-            val rates = listOf(ExchangeRate(Currency.USD, 2f))
-            val exchangeRates = ExchangeRates(Currency.EUR, DateTime.now(), rates)
-            `when`(currencyRepository.getExchangeRates(Currency.EUR)).thenReturn(flowOf(exchangeRates))
+            val rates = listOf(ExchangeRate(USD, 2f))
+            val exchangeRates = ExchangeRates(EUR, DateTime.now(), rates)
+            `when`(currencyRepository.getExchangeRates(EUR)).thenReturn(flowOf(exchangeRates))
 
-            viewModel.intent(ExchangeRatesAction.SetCurrency(Currency.EUR))
-            delay(LOADING_DELAY + 100)
+            viewModel.intent(ExchangeRatesAction.SetCurrency(EUR))
+            delay(LOADING_DELAY + 10)
 
-            assertEquals(Currency.USD, viewModel.state.value.outputs.first().currency)
-            assertEquals(2f, viewModel.state.value.outputs.first().calculatedValue)
-            assertFalse(viewModel.state.value.isEmpty)
-            assertFalse(viewModel.state.value.isLoading)
-            assertNull(viewModel.state.value.error)
+            val result = viewModel.state.value as ExchangeRatesUiState.Result
+            assertEquals(USD, result.outputs.first().exchangeRate.currency)
+            assertEquals(2f, result.outputs.first().calculatedValue)
         }
     }
 
     @Test
     fun `GIVEN repository error WHEN set currency THEN error state returned`() {
         runBlocking {
-            `when`(currencyRepository.getExchangeRates(Currency.PLN)).thenThrow(NoDataException())
+            `when`(currencyRepository.getExchangeRates(PLN)).thenThrow(NoDataException())
 
-            viewModel.intent(ExchangeRatesAction.SetCurrency(Currency.PLN))
-            delay(LOADING_DELAY + 100)
+            viewModel.intent(ExchangeRatesAction.SetCurrency(PLN))
+            delay(LOADING_DELAY + 10)
 
-            assertNotNull(viewModel.state.value.error)
-            assertTrue(viewModel.state.value.outputs.isEmpty())
+            val error = viewModel.state.value as ExchangeRatesUiState.Error
+            assertNotNull(error.error)
         }
     }
 
     @Test
-    fun `GIVEN repository data WHEN set currency value THEN success state returned`() {
+    fun `GIVEN value 2 WHEN set currency value THEN result state returned`() {
         runBlocking {
-            val rates = listOf(ExchangeRate(Currency.USD, 2f))
-            val exchangeRates = ExchangeRates(DEFAULT_CURRENCY, DateTime.now(), rates)
-            `when`(currencyRepository.getExchangeRates(DEFAULT_CURRENCY))
-                .thenReturn(flowOf(exchangeRates))
-
             viewModel.intent(ExchangeRatesAction.SetValue(2f))
-            delay(LOADING_DELAY + 100)
+            delay(10)
 
-            assertEquals(Currency.USD, viewModel.state.value.outputs.first().currency)
-            assertEquals(4f, viewModel.state.value.outputs.first().calculatedValue)
-            assertFalse(viewModel.state.value.isEmpty)
-            assertFalse(viewModel.state.value.isLoading)
-            assertNull(viewModel.state.value.error)
+            val result = viewModel.state.value as ExchangeRatesUiState.Result
+            assertEquals(USD, result.outputs.first().exchangeRate.currency)
+            assertEquals(4f, result.outputs.first().calculatedValue)
         }
     }
 
     @Test
-    fun `GIVEN repository error WHEN set currency value THEN error state returned`() {
+    fun `GIVEN any input WHEN set currency THEN state set to loading before finally result`() {
         runBlocking {
-            `when`(currencyRepository.getExchangeRates(DEFAULT_CURRENCY)).thenThrow(NoDataException())
+            val rates = listOf(ExchangeRate(EUR, 2f))
+            val exchangeRates = ExchangeRates(USD, DateTime.now(), rates)
+            `when`(currencyRepository.getExchangeRates(USD)).thenReturn(flowOf(exchangeRates))
 
-            viewModel.intent(ExchangeRatesAction.SetValue(2f))
-            delay(LOADING_DELAY + 100)
-
-            println(viewModel.state.value)
-            assertNotNull(viewModel.state.value.error)
-            assertTrue(viewModel.state.value.outputs.isEmpty())
-        }
-    }
-
-    @Test
-    fun `GIVEN nothing WHEN refresh data THEN state set to loading before finally result`() {
-        runBlocking {
-            val rates = listOf(ExchangeRate(Currency.USD, 2f))
-            val exchangeRates = ExchangeRates(Currency.EUR, DateTime.now(), rates)
-            `when`(currencyRepository.getExchangeRates(Currency.EUR)).thenReturn(flowOf(exchangeRates))
-
-            viewModel.intent(ExchangeRatesAction.SetCurrency(Currency.EUR))
-            assertTrue(viewModel.state.value.isLoading)
+            viewModel.intent(ExchangeRatesAction.SetCurrency(USD))
+            delay(10)
+            assertTrue(viewModel.state.value is ExchangeRatesUiState.Loading)
 
             delay(LOADING_DELAY + 100)
-            assertFalse(viewModel.state.value.isLoading)
+            assertFalse(viewModel.state.value is ExchangeRatesUiState.Loading)
         }
     }
 }

@@ -64,8 +64,8 @@ fun ChooseCurrencyDialog(
                 )
 
                 LazyColumn {
-                    val size = Currency.values().size
-                    Currency.values().forEachIndexed { index, currency ->
+                    val size = Currency.getAll().size
+                    Currency.getAll().forEachIndexed { index, currency ->
                         item {
                             Row(
                                 modifier = Modifier

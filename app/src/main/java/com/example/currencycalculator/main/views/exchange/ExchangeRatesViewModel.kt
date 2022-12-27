@@ -2,82 +2,118 @@ package com.example.currencycalculator.main.views.exchange
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesAction.SetCurrency
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesAction.SetValue
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesUiState.*
 import com.example.data.models.Currency
-import com.example.data.models.ExchangeRates
-import com.example.data.respositories.CurrencyRepository
+import com.example.data.models.ExchangeRate
+import com.example.data.models.Settings
+import com.example.data.respositories.currency.CurrencyRepository
+import com.example.data.respositories.settings.SettingsRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.text.DecimalFormat
 
-class ExchangeRatesViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
+class ExchangeRatesViewModel(
+    private val currencyRepository: CurrencyRepository,
+    private val settingsRepository: SettingsRepository
+) : ViewModel() {
 
-    private val statePrivate = MutableStateFlow(getDefaultState())
-    val state: StateFlow<ExchangeRatesUiState> get() = statePrivate
+    private val _state = MutableStateFlow<ExchangeRatesUiState>(Initialize)
+    val state: StateFlow<ExchangeRatesUiState> get() = _state
 
-    var loadingJob: Job? = null
+    private lateinit var settings: Settings
+    private var loadingJob: Job? = null
 
     init {
-        refreshData(
-            currency = state.value.baseCurrency,
-            value = state.value.baseCurrencyValue
-        )
+        Timber.d("Initialize view model ($this)")
+        viewModelScope.launch {
+            settings = settingsRepository.getSettings().first()
+            reload(settings.baseCurrency)
+        }
     }
 
     fun intent(action: ExchangeRatesAction) {
         when (action) {
-            is ExchangeRatesAction.SetCurrency -> refreshData(
-                currency = action.currency,
-                value = state.value.baseCurrencyValue
-            )
-            is ExchangeRatesAction.SetValue -> refreshData(
-                currency = state.value.baseCurrency,
-                value = action.value
-            )
-        }
-    }
-
-    private fun getDefaultState(): ExchangeRatesUiState {
-        return ExchangeRatesUiState(
-            baseCurrency = DEFAULT_CURRENCY,
-            baseCurrencyValue = DEFAULT_CURRENCY_VALUE,
-            isEmpty = true
-        )
-    }
-
-    private fun refreshData(currency: Currency, value: Float) {
-        if (loadingJob?.isActive == true) loadingJob?.cancel()
-        loadingJob = viewModelScope.launch {
-            val newState = ExchangeRatesUiState(baseCurrency = currency, baseCurrencyValue = value)
-            try {
-                statePrivate.emit(newState.copy(isLoading = true))
-                delay(LOADING_DELAY)
-
-                val exchangeRates = currencyRepository.getExchangeRates(currency).single()
-
-                statePrivate.emit(newState.copy(outputs = calculateRates(value, exchangeRates)))
-            } catch (e: Exception) {
-                statePrivate.emit(newState.copy(error = e))
+            is SetCurrency -> {
+                Timber.i("Set currency: ${action.currency}")
+                reload(action.currency)
+            }
+            is SetValue -> {
+                Timber.i("Set value: ${action.value}")
+                recalculate(action.value)
             }
         }
     }
 
-    private fun calculateRates(
-        value: Float,
-        exchangeRates: ExchangeRates
-    ): List<CalculatedExchangeRate> {
-        return exchangeRates.rates.map { exchangeRate ->
-            CalculatedExchangeRate(
-                currency = exchangeRate.currency,
-                rate = exchangeRate.currencyRate,
-                calculatedValue = exchangeRate.currencyRate * value
-            )
+    private fun reload(currency: Currency) {
+        if (loadingJob?.isActive == true) loadingJob?.cancel()
+        loadingJob = viewModelScope.launch {
+            try {
+                val loading = Loading(value = state.value.value, baseCurrency = currency)
+                _state.emit(loading)
+
+                delay(LOADING_DELAY)
+                val exchangeRates = currencyRepository.getExchangeRates(currency).single()
+
+                val result = Result(
+                    value = state.value.value,
+                    baseCurrency = currency,
+                    outputs = calculateOutputs(exchangeRates.rates)
+                )
+
+                Timber.d("Reload succeed: $result")
+                _state.emit(result)
+            } catch (e: Exception) {
+                Timber.e("Error at reload: $e")
+                val error = Error(
+                    value = state.value.value,
+                    baseCurrency = currency,
+                    error = e
+                )
+                _state.emit(error)
+            }
         }
     }
 
+    private fun recalculate(value: Float) {
+        viewModelScope.launch {
+            val previousState = state.value as? Result ?: return@launch
+            val formattedValue = formatValue(value)
+            val outputs = previousState.outputs
+                .map { calculateRate(it.exchangeRate, formattedValue) }
+
+            val result = previousState.copy(value = formattedValue, outputs = outputs)
+            Timber.d("Recalculate succeed")
+            _state.emit(result)
+        }
+    }
+
+    private fun calculateOutputs(rates: List<ExchangeRate>): List<CalculatedExchangeRate> {
+        return settings.order
+            .mapNotNull { currency -> rates.firstOrNull { it.currency == currency } }
+            .map { exchangeRate -> calculateRate(exchangeRate, state.value.value) }
+    }
+
+    private fun calculateRate(exchangeRate: ExchangeRate, value: Float): CalculatedExchangeRate {
+        return CalculatedExchangeRate(
+            exchangeRate = exchangeRate,
+            calculatedValue = formatValue(exchangeRate.currencyRate * value)
+        )
+    }
+
+    private fun formatValue(value: Float): Float {
+        val pattern = "#.${0.rangeTo(settings.valuePrecision).joinToString("") { "#" }}"
+        return DecimalFormat(pattern).format(value).toFloat()
+    }
+
     companion object {
-        const val DEFAULT_CURRENCY_VALUE = 1f
         const val LOADING_DELAY = 1000L
-        val DEFAULT_CURRENCY = Currency.getOrNull("USD") ?: Currency.USD
     }
 }

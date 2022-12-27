@@ -41,6 +41,7 @@ dependencies {
     val junitVersion: String by System.getProperties()
     val mockitoVersion: String by System.getProperties()
     val mockitoKotlinVersion: String by System.getProperties()
+    val timberVersion: String by System.getProperties()
 
     // Kotlin Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
@@ -54,6 +55,9 @@ dependencies {
 
     // Data Store
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Logging
+    implementation("com.jakewharton.timber:timber:$timberVersion")
 
     // Tests
     testImplementation("junit:junit:$junitVersion")

@@ -24,20 +24,25 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle.Event.*
 import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
 import com.example.currencycalculator.main.views.dialogs.ChooseCurrencyDialog
 import com.example.currencycalculator.utils.SuffixTransformation
 import com.example.data.models.Currency
 import com.example.data.models.ExchangeRates
-import com.example.data.respositories.CurrencyRepository
+import com.example.data.models.Settings
+import com.example.data.respositories.currency.CurrencyRepository
+import com.example.data.respositories.settings.SettingsRepository
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesUiState.*
+import com.example.currencycalculator.main.views.exchange.ExchangeRatesAction.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.koin.androidx.compose.get
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalUnitApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
+fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = koinViewModel()) {
 
     val state = viewModel.state.collectAsState()
 
@@ -63,7 +68,8 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = state.value.baseCurrencyValue.toString(),
+                enabled = state.value !is Initialize,
+                value = state.value.value.toString(),
                 modifier = Modifier.weight(1f),
                 label = { Text(text = stringResource(id = R.string.exchange_rates_type_value)) },
                 singleLine = true,
@@ -74,12 +80,13 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
                 ),
                 onValueChange = { stringValue ->
                     val value = stringValue.toFloatOrNull() ?: return@OutlinedTextField
-                    viewModel.intent(ExchangeRatesAction.SetValue(value))
+                    viewModel.intent(SetValue(value))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             IconButton(
+                enabled = state.value !is Initialize,
                 onClick = { isOpenChooseCurrencyDialog = true }
             ) {
                 Box(
@@ -105,7 +112,7 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
         }
 
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            if (state.value.isLoading) {
+            if (state.value is Loading) {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,18 +127,19 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
 
         Divider(modifier = Modifier.padding(bottom = 8.dp), color = Color.Black, thickness = 1.dp)
 
-        when {
-            state.value.isEmpty -> EmptyExchangeRatesView()
-            state.value.error != null -> ErrorExchangeRatesView(error = state.value.error)
-            state.value.outputs.isNotEmpty() -> {
+        when (val uiState = state.value) {
+            Initialize -> EmptyExchangeRatesView()
+            is Error -> ErrorExchangeRatesView(error = uiState.error)
+            is Loading -> EmptyExchangeRatesView()
+            is Result -> {
                 LazyColumn {
-                    state.value.outputs.forEachIndexed { index, exchangeRate ->
+                    uiState.outputs.forEachIndexed { index, calculatedExchangeRate ->
                         item {
                             ExchangeRateView(
                                 baseCurrency = state.value.baseCurrency,
-                                exchangeRate = exchangeRate
+                                calculatedExchangeRate = calculatedExchangeRate
                             )
-                            if (index < state.value.outputs.size - 1) {
+                            if (index < uiState.outputs.size - 1) {
                                 Divider(
                                     modifier = Modifier.padding(vertical = 16.dp),
                                     color = Color.Gray,
@@ -150,7 +158,7 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = get()) {
             onDismiss = { isOpenChooseCurrencyDialog = false },
             onChoseCurrency = { currency ->
                 isOpenChooseCurrencyDialog = false
-                viewModel.intent(ExchangeRatesAction.SetCurrency(currency))
+                viewModel.intent(SetCurrency(currency))
             }
         )
     }
@@ -183,11 +191,22 @@ fun ErrorExchangeRatesView(error: Throwable?) {
 @Composable
 fun ExchangeRatesViewPreview() {
 
-    val mockViewModel = ExchangeRatesViewModel(object : CurrencyRepository {
-        override fun getExchangeRates(baseCurrency: Currency): Flow<ExchangeRates> {
-            return flow { }
+    val mockViewModel = ExchangeRatesViewModel(
+        currencyRepository = object : CurrencyRepository {
+
+            override fun getExchangeRates(baseCurrency: Currency): Flow<ExchangeRates> = flow { }
+        },
+        settingsRepository = object : SettingsRepository {
+
+            override fun getSettings(): Flow<Settings> = flow { }
+
+            override suspend fun setBaseCurrency(baseCurrency: Currency) {}
+
+            override suspend fun setValuePrecision(valuePrecision: Int) {}
+
+            override suspend fun setCurrenciesOrder(order: List<Currency>) {}
         }
-    })
+    )
 
     ExchangeRatesView(viewModel = mockViewModel)
 }

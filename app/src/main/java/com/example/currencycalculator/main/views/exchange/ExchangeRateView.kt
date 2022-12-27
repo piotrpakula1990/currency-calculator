@@ -12,10 +12,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.example.data.models.Currency
+import com.example.data.models.ExchangeRate
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
-fun ExchangeRateView(baseCurrency: Currency, exchangeRate: CalculatedExchangeRate) {
+fun ExchangeRateView(baseCurrency: Currency, calculatedExchangeRate: CalculatedExchangeRate) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -28,12 +29,12 @@ fun ExchangeRateView(baseCurrency: Currency, exchangeRate: CalculatedExchangeRat
             horizontalAlignment = Alignment.End
         ) {
             Text(
-                text = "${exchangeRate.calculatedValue} ${exchangeRate.currency}",
+                text = "${calculatedExchangeRate.calculatedValue} ${calculatedExchangeRate.exchangeRate.currency}",
                 fontSize = TextUnit(15f, TextUnitType.Sp)
             )
 
             Text(
-                text = "1 $baseCurrency = ${exchangeRate.rate} ${exchangeRate.currency}",
+                text = "1 $baseCurrency = ${calculatedExchangeRate.exchangeRate.currencyRate} ${calculatedExchangeRate.exchangeRate.currency}",
                 color = Color.Gray,
                 fontSize = TextUnit(10f, TextUnitType.Sp)
             )
@@ -42,7 +43,7 @@ fun ExchangeRateView(baseCurrency: Currency, exchangeRate: CalculatedExchangeRat
         Box(contentAlignment = Alignment.Center) {
             Text(
                 modifier = Modifier.padding(end = 8.dp),
-                text = exchangeRate.currency.flag,
+                text = calculatedExchangeRate.exchangeRate.currency.flag,
                 fontSize = TextUnit(25f, TextUnitType.Sp)
             )
         }
@@ -52,8 +53,8 @@ fun ExchangeRateView(baseCurrency: Currency, exchangeRate: CalculatedExchangeRat
 @Preview(showBackground = true)
 @Composable
 fun ExchangeRateViewPreview() {
-    val mock = CalculatedExchangeRate(Currency.USD, 1.5f, 5.5f)
-    ExchangeRateView(baseCurrency = Currency.EUR, exchangeRate = mock)
+    val mock = CalculatedExchangeRate(ExchangeRate(Currency.USD, 1.5f), 5.5f)
+    ExchangeRateView(baseCurrency = Currency.EUR, calculatedExchangeRate = mock)
 }
 
 

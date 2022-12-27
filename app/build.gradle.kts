@@ -51,6 +51,7 @@ dependencies {
     val junitVersion: String by System.getProperties()
     val mockitoVersion: String by System.getProperties()
     val mockitoKotlinVersion: String by System.getProperties()
+    val timberVersion: String by System.getProperties()
 
     // Modules
     implementation(project(":data"))
@@ -81,6 +82,9 @@ dependencies {
 
     // Joda Time
     implementation("net.danlew:android.joda:$jodaTimeVersion")
+
+    // Logging
+    implementation("com.jakewharton.timber:timber:$timberVersion")
 
     // Tests
     testImplementation("junit:junit:$junitVersion")

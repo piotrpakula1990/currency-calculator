@@ -82,7 +82,7 @@ fun DragAndDropLazyList(initOrder: List<Currency>, onSave: (List<Currency>) -> U
     val initItems = initOrder
         .map { currency -> DragAndDropItem(currency, !initOrder.contains(currency), 0f) }
         .plus(
-            Currency.values()
+            Currency.getAll()
                 .filter { currency -> !initOrder.contains(currency) }
                 .map { currency -> DragAndDropItem(currency, !initOrder.contains(currency), 0f) }
         )

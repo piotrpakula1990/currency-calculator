@@ -7,7 +7,7 @@ import com.example.data.models.exceptions.DeprecatedDataException
 import com.example.data.models.exceptions.NoDataException
 import com.example.data.remote.ExchangeRateService
 import com.example.data.remote.models.ExchangeRatesRemote
-import com.example.data.respositories.CurrencyRepositoryImpl
+import com.example.data.respositories.currency.CurrencyRepositoryImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.joda.time.DateTime

@@ -12,6 +12,7 @@ enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
     CZK(R.string.CZK, "🇨🇿"),
     DKK(R.string.DKK, "🇩🇰"),
     EUR(R.string.EUR, "🇪🇺"),
+    GBP(R.string.GBP, "🇬🇧"),
     GEL(R.string.GEL, "🇬🇪"),
     HUF(R.string.HUF, "🇭🇺"),
     ISK(R.string.ISK, "🇮🇸"),
@@ -28,7 +29,8 @@ enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
     CHF(R.string.CHF, "🇨🇭"),
     TRY(R.string.TRY, "🇹🇷"),
     UAH(R.string.UAH, "🇺🇦"),
-    USD(R.string.USD, "🇺🇲");
+    USD(R.string.USD, "🇺🇲"),
+    UNK(R.string.UNK, "🏴󠁢󠁳󠁢󠁰󠁿"); // Unknown
 
     companion object {
 
@@ -37,5 +39,7 @@ enum class Currency(@StringRes val fullNameId: Int, val flag: String) {
         } catch (e: Exception) {
             null
         }
+
+        fun getAll(): Array<Currency> = values().filter { it != UNK }.toTypedArray()
     }
 }

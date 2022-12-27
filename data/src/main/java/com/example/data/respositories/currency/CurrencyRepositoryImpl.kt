@@ -1,4 +1,4 @@
-package com.example.data.respositories
+package com.example.data.respositories.currency
 
 import com.example.data.local.LocalDataSource
 import com.example.data.remote.ExchangeRateService
@@ -10,6 +10,7 @@ import com.example.data.models.exceptions.MappingException
 import com.example.data.models.exceptions.NoDataException
 import kotlinx.coroutines.flow.*
 import org.joda.time.DateTime
+import timber.log.Timber
 
 class CurrencyRepositoryImpl(
     private val exchangeRateService: ExchangeRateService,
@@ -21,15 +22,21 @@ class CurrencyRepositoryImpl(
             try {
                 val exchangeRates = exchangeRateService.latest(baseCurrency.name).asExchangeRates()
                 localDataSource.setExchangeRates(exchangeRates)
+
+                Timber.d("Success at get remote exchange rates.")
                 emit(exchangeRates)
             } catch (t : Throwable) {
+                Timber.w("Error at get remote data: $t")
                 val exchangeRates : ExchangeRates = localDataSource.getExchangeRates().first()
 
                 when {
                     t is MappingException -> throw NoDataException()
                     isWrongBaseCurrency(baseCurrency, exchangeRates) -> throw NoDataException()
                     isExchangeRatesDeprecated(exchangeRates) -> throw DeprecatedDataException()
-                    else -> emit(exchangeRates)
+                    else -> {
+                        Timber.d("Success at get local(cached) exchange rates.")
+                        emit(exchangeRates)
+                    }
                 }
             }
         }
