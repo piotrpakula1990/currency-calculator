@@ -1,6 +1,7 @@
 package com.example.currencycalculator.main.navigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,11 @@ fun MainActivityNavigation(builder: NavGraphBuilder.() -> Unit) {
     val selectedDestination = navBackStackEntry?.destination?.route
         ?: Destination.Exchange.route
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         NavHost(
             modifier = Modifier.weight(1f),
             navController = navController,

@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.composable
 import com.example.currencycalculator.main.navigation.Destination
 import com.example.currencycalculator.main.navigation.MainActivityNavigation
+import com.example.currencycalculator.main.theme.AppTheme
 import com.example.currencycalculator.main.views.exchange.ExchangeRatesView
 import com.example.currencycalculator.main.views.settings.SettingsView
 
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MaterialTheme {
+            AppTheme {
                 MainActivityNavigation {
                     composable(Destination.Exchange.route) {
                         ExchangeRatesView()

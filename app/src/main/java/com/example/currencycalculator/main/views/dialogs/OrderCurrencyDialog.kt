@@ -1,5 +1,6 @@
 package com.example.currencycalculator.main.views.dialogs
 
+import android.content.res.Configuration
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.*
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import com.example.currencycalculator.R
+import com.example.currencycalculator.main.theme.AppTheme
 import com.example.data.models.Currency
 import kotlin.math.roundToInt
 
@@ -42,11 +44,11 @@ fun OrderCurrencyDialog(
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .padding(vertical = 16.dp)
                 .clip(RoundedCornerShape(5.dp))
-                .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(5.dp)),
+                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.inverseSurface), shape = RoundedCornerShape(5.dp)),
             shadowElevation = 5.dp
         ) {
             Column(
@@ -61,11 +63,12 @@ fun OrderCurrencyDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 5.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Divider(
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     thickness = 1.dp
                 )
 
@@ -186,21 +189,22 @@ private fun DragAndDropExampleItem(
             .offset { IntOffset(0, offsetY.roundToInt() + verticalTranslation) }
             .fillMaxWidth()
             .padding(1.dp)
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .height(itemHeight)
-            .border(1.dp, Color.Gray, RoundedCornerShape(3.dp))
+            .border(1.dp, MaterialTheme.colorScheme.inverseSurface, RoundedCornerShape(3.dp))
             .padding(2.dp)
             .zIndex(zIndex),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
             checked = !item.isHidden,
-            onCheckedChange = { onChecked(it) }
+            onCheckedChange = { onChecked(it) },
         )
 
         Text(
             text = item.value.flag,
-            fontSize = TextUnit(20f, TextUnitType.Sp)
+            fontSize = TextUnit(20f, TextUnitType.Sp),
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
@@ -210,7 +214,8 @@ private fun DragAndDropExampleItem(
                 .weight(1f),
             text = "${item.value.name} (${stringResource(id = item.value.fullNameId)})",
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Icon(
@@ -247,4 +252,12 @@ private fun DragAndDropExampleItem(
 @Composable
 fun OrderCurrencyDialogPreview() {
     ChooseCurrencyDialog()
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun OrderCurrencyDialogPreviewNightMode() {
+    AppTheme {
+        ChooseCurrencyDialog()
+    }
 }

@@ -1,6 +1,8 @@
 package com.example.currencycalculator.main.views.exchange
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +32,8 @@ fun ExchangeRateView(baseCurrency: Currency, calculatedExchangeRate: CalculatedE
         ) {
             Text(
                 text = "${calculatedExchangeRate.calculatedValue} ${calculatedExchangeRate.exchangeRate.currency}",
-                fontSize = TextUnit(15f, TextUnitType.Sp)
+                fontSize = TextUnit(15f, TextUnitType.Sp),
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
@@ -53,6 +56,13 @@ fun ExchangeRateView(baseCurrency: Currency, calculatedExchangeRate: CalculatedE
 @Preview(showBackground = true)
 @Composable
 fun ExchangeRateViewPreview() {
+    val mock = CalculatedExchangeRate(ExchangeRate(Currency.USD, 1.5f), 5.5f)
+    ExchangeRateView(baseCurrency = Currency.EUR, calculatedExchangeRate = mock)
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ExchangeRateViewPreviewNightMode() {
     val mock = CalculatedExchangeRate(ExchangeRate(Currency.USD, 1.5f), 5.5f)
     ExchangeRateView(baseCurrency = Currency.EUR, calculatedExchangeRate = mock)
 }

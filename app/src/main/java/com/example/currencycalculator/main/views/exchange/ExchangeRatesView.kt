@@ -1,5 +1,6 @@
 package com.example.currencycalculator.main.views.exchange
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle.Event.*
 import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
+import com.example.currencycalculator.main.theme.AppTheme
 import com.example.currencycalculator.main.views.dialogs.ChooseCurrencyDialog
 import com.example.currencycalculator.utils.SuffixTransformation
 import com.example.data.models.Currency
@@ -59,7 +61,8 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = koinViewModel()) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 5.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Row(
@@ -117,15 +120,19 @@ fun ExchangeRatesView(viewModel: ExchangeRatesViewModel = koinViewModel()) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(2.dp),
-                    trackColor = Color.LightGray,
-                    color = Color.Black
+                    trackColor = MaterialTheme.colorScheme.onSecondary,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             } else {
                 Spacer(modifier = Modifier.size(0.dp, 2.dp))
             }
         }
 
-        Divider(modifier = Modifier.padding(bottom = 8.dp), color = Color.Black, thickness = 1.dp)
+        Divider(
+            modifier = Modifier.padding(bottom = 8.dp),
+            color = MaterialTheme.colorScheme.onSurface,
+            thickness = 1.dp
+        )
 
         when (val uiState = state.value) {
             Initialize -> EmptyExchangeRatesView()
@@ -182,7 +189,7 @@ fun ErrorExchangeRatesView(error: Throwable?) {
         Text(
             text = error?.message ?: "Error",
             fontSize = TextUnit(25f, TextUnitType.Sp),
-            color = Color.Red
+            color = MaterialTheme.colorScheme.error
         )
     }
 }
@@ -208,7 +215,35 @@ fun ExchangeRatesViewPreview() {
         }
     )
 
-    ExchangeRatesView(viewModel = mockViewModel)
+    AppTheme {
+        ExchangeRatesView(viewModel = mockViewModel)
+    }
+}
+
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun ExchangeRatesViewPreviewNightMode() {
+
+    val mockViewModel = ExchangeRatesViewModel(
+        currencyRepository = object : CurrencyRepository {
+
+            override fun getExchangeRates(baseCurrency: Currency): Flow<ExchangeRates> = flow { }
+        },
+        settingsRepository = object : SettingsRepository {
+
+            override fun getSettings(): Flow<Settings> = flow { }
+
+            override suspend fun setBaseCurrency(baseCurrency: Currency) {}
+
+            override suspend fun setValuePrecision(valuePrecision: Int) {}
+
+            override suspend fun setCurrenciesOrder(order: List<Currency>) {}
+        }
+    )
+
+    AppTheme {
+        ExchangeRatesView(viewModel = mockViewModel)
+    }
 }
 
 

@@ -1,5 +1,6 @@
 package com.example.currencycalculator.main.views.dialogs
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.currencycalculator.R
+import com.example.currencycalculator.main.theme.AppTheme
 import com.example.data.models.Currency
 
 @OptIn(ExperimentalUnitApi::class)
@@ -35,11 +37,14 @@ fun ChooseCurrencyDialog(
     Dialog(onDismissRequest = { onDismiss() }) {
 
         Surface(
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .padding(vertical = 16.dp)
                 .clip(RoundedCornerShape(5.dp))
-                .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(5.dp)),
+                .border(
+                    BorderStroke(1.dp, MaterialTheme.colorScheme.inverseSurface),
+                    shape = RoundedCornerShape(5.dp)
+                ),
             shadowElevation = 5.dp
         ) {
             Column(
@@ -54,12 +59,13 @@ fun ChooseCurrencyDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 5.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Divider(
                     modifier = Modifier.padding(bottom = 8.dp),
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     thickness = 1.dp
                 )
 
@@ -91,7 +97,7 @@ fun ChooseCurrencyDialog(
                             if (index < size - 1) {
                                 Divider(
                                     modifier = Modifier.padding(vertical = 2.dp),
-                                    color = Color.Gray,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     thickness = 1.dp
                                 )
                             }
@@ -106,5 +112,15 @@ fun ChooseCurrencyDialog(
 @Preview(showBackground = true)
 @Composable
 fun ChooseCurrencyDialogPreview() {
-    ChooseCurrencyDialog()
+    AppTheme {
+        ChooseCurrencyDialog()
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ChooseCurrencyDialogPreviewNightMode() {
+    AppTheme {
+        ChooseCurrencyDialog()
+    }
 }

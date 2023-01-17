@@ -1,6 +1,7 @@
 package com.example.currencycalculator.main.views.settings
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.example.currencycalculator.R
 import com.example.currencycalculator.main.navigation.Destination
+import com.example.currencycalculator.main.theme.AppTheme
 import com.example.currencycalculator.main.views.dialogs.ChooseCurrencyDialog
 import com.example.currencycalculator.main.views.dialogs.OrderCurrencyDialog
 import com.example.currencycalculator.main.views.settings.SettingsUiState.*
@@ -56,7 +58,8 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 5.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         SettingRow(label = stringResource(id = R.string.settings_default_base), content = {
@@ -64,7 +67,8 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
             Text(
                 text = "${state.value.baseCurrency} $fullCurrencyName",
                 modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Left
+                textAlign = TextAlign.Left,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             IconButton(
@@ -99,7 +103,8 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
                 modifier = Modifier
                     .weight(0.8f)
                     .padding(vertical = 16.dp),
-                textAlign = TextAlign.Left
+                textAlign = TextAlign.Left,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             TextField(
@@ -107,7 +112,8 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
                 enabled = state.value !is Initialize,
                 modifier = Modifier.weight(0.2f),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    textColor = MaterialTheme.colorScheme.onSurface
                 ),
                 singleLine = true,
                 textStyle = TextStyle(
@@ -129,7 +135,8 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
                     modifier = Modifier
                         .weight(1f)
                         .padding(vertical = 16.dp),
-                    textAlign = TextAlign.Left
+                    textAlign = TextAlign.Left,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 IconButton(
@@ -144,8 +151,9 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .size(30.dp)
-                                .border(1.dp, Color.Gray, RoundedCornerShape(3.dp)),
+                                .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(3.dp)),
                             imageVector = Icons.Filled.FormatListBulleted,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             contentDescription = stringResource(id = R.string.settings_value_filter_and_order_description)
                         )
 
@@ -190,10 +198,11 @@ fun SettingRow(label: String, content: @Composable RowScope.() -> Unit) {
         Text(
             text = label,
             textAlign = TextAlign.Left,
-            fontSize = TextUnit(12f, TextUnitType.Sp)
+            fontSize = TextUnit(12f, TextUnitType.Sp),
+            color = MaterialTheme.colorScheme.onSurface
         )
 
-        Divider(color = Color.Gray, thickness = 1.dp)
+        Divider(color = MaterialTheme.colorScheme.onSurfaceVariant, thickness = 1.dp)
 
         Row(
             modifier = Modifier
@@ -220,5 +229,27 @@ fun SettingsViewPreview() {
 
         override suspend fun setCurrenciesOrder(order: List<Currency>) {}
     })
-    SettingsView(viewModel = mockViewModel)
+
+    AppTheme {
+        SettingsView(viewModel = mockViewModel)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SettingsViewPreviewNightMode() {
+    val mockViewModel = SettingsViewModel(object : SettingsRepository {
+
+        override fun getSettings(): Flow<Settings> = flow { }
+
+        override suspend fun setBaseCurrency(baseCurrency: Currency) {}
+
+        override suspend fun setValuePrecision(valuePrecision: Int) {}
+
+        override suspend fun setCurrenciesOrder(order: List<Currency>) {}
+    })
+
+    AppTheme {
+        SettingsView(viewModel = mockViewModel)
+    }
 }
