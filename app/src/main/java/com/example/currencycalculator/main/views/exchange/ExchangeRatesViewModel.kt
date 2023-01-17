@@ -109,8 +109,8 @@ class ExchangeRatesViewModel(
     }
 
     private fun formatValue(value: Float): Float {
-        val pattern = "#,${0.rangeTo(settings.valuePrecision).joinToString("") { "#" }}"
-        return DecimalFormat(pattern).format(value).toFloat()
+        val pattern = "#.${(0 until settings.valuePrecision).joinToString("") { "#" }}"
+        return DecimalFormat(pattern).format(value).replace(",", ".").toFloat()
     }
 
     companion object {

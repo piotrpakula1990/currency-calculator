@@ -35,6 +35,7 @@ import com.example.data.respositories.settings.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalUnitApi::class, ExperimentalMaterial3Api::class)
@@ -122,7 +123,11 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = { stringValue ->
-                    val value = stringValue.toIntOrNull() ?: return@TextField
+                    val value = stringValue
+                        .firstOrNull { it != state.value.valuePrecision.digitToChar() }
+                        ?.digitToIntOrNull()
+                        ?: return@TextField
+
                     viewModel.intent(SetValuePrecision(value))
                 })
         })
@@ -151,7 +156,11 @@ fun SettingsView(viewModel: SettingsViewModel = koinViewModel()) {
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .size(30.dp)
-                                .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(3.dp)),
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.onSurface,
+                                    RoundedCornerShape(3.dp)
+                                ),
                             imageVector = Icons.Filled.FormatListBulleted,
                             tint = MaterialTheme.colorScheme.onSurface,
                             contentDescription = stringResource(id = R.string.settings_value_filter_and_order_description)
